@@ -1,6 +1,6 @@
 -- CUSTOM CRITERIA FOR EVERYONE
 -- Compiled and maintained by CMDR Julian Ford
--- v1.6.0 / Released April 26, 2026
+-- v1.6.1 / Released April 26, 2026
 
 --[[Elite Observatory is a phenomenal tool for exploring in Elite Dangerous, and it is all the better
     because we get to write our own custom criteria, which supplement the default criteria in the app
@@ -388,8 +388,8 @@ LANDABLES, ATMOSPHERES AND SIGNALS
     trigger the "Ring has fast orbital period" notification.
 ]]--
     triggerForRingWithFastOrbitalPeriod = true
-    ringOrbitalPeriodThreshold = 5400
-                     -- example: 5400 == 90 minutes to execute one full rotation
+    ringOrbitalPeriodThreshold = 1800
+                     -- example: 3600 == 60 minutes to execute one full rotation
 
 
 ---------------------------------------
@@ -1208,14 +1208,14 @@ if triggerForRingWithFastOrbitalPeriod then
         local periodResult = ""
         
         for ring in ringsOnly(scan.Rings) do
-            local averageRadius = (ring.outerrad + ring.innerrad) / 2 -- get average radius for the ring in meters, Elite uses this for calcs
-            local orbitalVelocity = math.sqrt(G * (planetMass / averageRadius)) / 1000 --in km/s
+            local orbitalRadius = ring.outerrad / math.exp(1) -- 1/e of outer radius; Elite uses this to calc the ring's effective radius for other measurements
+            local orbitalVelocity = math.sqrt(G * (planetMass / orbitalRadius)) / 1000 --in km/s
                     
             if orbitalVelocity == 0 then --recalc velocity if it is a star rather than a planet
-                orbitalVelocity = math.sqrt(G * (starMass / averageRadius)) / 1000 --in km/s
+                orbitalVelocity = math.sqrt(G * (starMass / orbitalRadius)) / 1000 --in km/s
             end
             
-            local ringCircumference = 2 * (3.1415926 * (averageRadius / 1000)) --in km
+            local ringCircumference = 2 * (3.1415926 * (orbitalRadius / 1000)) --in km
             local ringOrbitalPeriod = (ringCircumference / orbitalVelocity) --in seconds
             
             if ringOrbitalPeriod <= ringOrbitalPeriodThreshold then
@@ -1243,9 +1243,9 @@ if triggerForHighVelocityRing then
         local starMass = scan.StellarMass * 1.988*(10^30)
         
         for ring in ringsOnly(scan.Rings) do
-            local averageRadius = (ring.outerrad + ring.innerrad) / 2 -- get average radius for the ring in meters
+            local orbitalRadius = ring.outerrad / math.exp(1) -- 1/e of outer radius; Elite uses this to calc the ring's effective radius for other measurements
             local mass = isStar(scan) and starMass or planetMass
-            local orbitalVelocity = math.sqrt(G * (mass / averageRadius)) / 1000
+            local orbitalVelocity = math.sqrt(G * (mass / orbitalRadius)) / 1000
 
             if orbitalVelocity >= ringVelocityThreshold then
                 return  string.format("Ring has high orbital velocity\n(%.2f km/s)", orbitalVelocity), 
