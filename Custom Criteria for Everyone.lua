@@ -1,6 +1,6 @@
 -- CUSTOM CRITERIA FOR EVERYONE
 -- Compiled and maintained by CMDR Julian Ford
--- v1.6.1 / Released April 26, 2026
+-- v1.6.2 / Released July 27, 2026
 
 --[[Elite Observatory is a phenomenal tool for exploring in Elite Dangerous, and it is all the better
     because we get to write our own custom criteria, which supplement the default criteria in the app
